@@ -273,7 +273,7 @@ function dateKey(d) {
 function todayKey() { return dateKey(new Date()); }
 
 function toggle(pid, dk) {
-  const k = pid + '_' + dk;
+  const k = String(pid) + '_' + dk;
   absences[k] = !absences[k];
   save();
   render();
@@ -370,9 +370,9 @@ function render() {
       </div>`;
     days.forEach(d => {
       const dk = dateKey(d);
-      const absent = !!absences[p.id+'_'+dk];
+      const absent = !!absences[String(p.id)+'_'+dk];
       html += `<div class="cell">
-        <button class="cell-btn${absent?' absent':''}" onclick="toggle(${JSON.stringify(p.id)},'${dk}')" aria-label="${p.name} ${dk}">
+        <button class="cell-btn${absent?' absent':''}" onclick="toggle('${p.id}','${dk}')" aria-label="${p.name} ${dk}">
           ${absent ? '✕' : '✓'}
         </button>
       </div>`;
