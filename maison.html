@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Maison">
-<title>Présences maison</title>
+<meta name="apple-mobile-web-app-title" content="Knock Knock">
+<title>Knock Knock 🏠</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   :root {
@@ -25,201 +25,83 @@
     --radius: 14px;
     --radius-sm: 10px;
   }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding-bottom: 2rem;
-  }
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 1.25rem 0.875rem;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 2rem; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.25rem 0.875rem; position: sticky; top: 0; z-index: 10; }
   .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem; }
   .app-title { font-size: 17px; font-weight: 600; color: var(--text); }
-  .today-badge {
-    font-size: 12px; font-weight: 500;
-    background: var(--accent-light); color: var(--accent);
-    padding: 4px 10px; border-radius: 20px;
-  }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); display: inline-block; margin-left: 6px; vertical-align: middle; }
+  .sync-dot.synced { background: var(--green); }
+  .sync-dot.syncing { background: orange; }
+  .today-badge { font-size: 12px; font-weight: 500; background: var(--accent-light); color: var(--accent); padding: 4px 10px; border-radius: 20px; }
   .week-nav { display: flex; align-items: center; gap: 12px; }
-  .week-nav button {
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); width: 36px; height: 36px;
-    font-size: 18px; color: var(--text-secondary); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
+  .week-nav button { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); width: 36px; height: 36px; font-size: 18px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .week-nav button:active { background: var(--border); }
   .week-label { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; text-align: center; }
   .main { padding: 1rem 1rem 0; }
-  .section-label {
-    font-size: 11px; font-weight: 600; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.06em;
-    padding: 0 0.25rem; margin-bottom: 0.625rem;
-  }
-  .grid-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 1rem;
-  }
-  .grid-header {
-    display: grid;
-    grid-template-columns: 80px repeat(7, 1fr);
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-  }
-  .grid-header .gh-empty { padding: 0.5rem; }
-  .day-head {
-    padding: 0.5rem 2px;
-    text-align: center;
-    border-left: 1px solid var(--border);
-  }
+  .section-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 0.25rem; margin-bottom: 0.625rem; }
+  .grid-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+  .grid-header { display: grid; grid-template-columns: 80px repeat(7, 1fr); border-bottom: 1px solid var(--border); background: var(--bg); }
+  .gh-empty { padding: 0.5rem; }
+  .day-head { padding: 0.5rem 2px; text-align: center; border-left: 1px solid var(--border); }
   .day-head .dname { font-size: 10px; font-weight: 500; color: var(--text-muted); display: block; }
-  .day-head .dnum {
-    font-size: 14px; font-weight: 600; color: var(--text);
-    width: 26px; height: 26px; border-radius: 50%;
-    display: inline-flex; align-items: center; justify-content: center;
-    margin-top: 1px;
-  }
+  .day-head .dnum { font-size: 14px; font-weight: 600; color: var(--text); width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
   .day-head.today .dname { color: var(--accent); }
   .day-head.today .dnum { background: var(--accent); color: white; font-size: 13px; }
-  .person-row {
-    display: grid;
-    grid-template-columns: 80px repeat(7, 1fr);
-    border-top: 1px solid var(--border);
-  }
+  .person-row { display: grid; grid-template-columns: 80px repeat(7, 1fr); border-top: 1px solid var(--border); }
   .person-row:first-child { border-top: none; }
-  .person-label {
-    display: flex; align-items: center; gap: 8px;
-    padding: 0.625rem 0.75rem;
-    border-right: 1px solid var(--border);
-  }
-  .avatar {
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 600; flex-shrink: 0;
-  }
+  .person-label { display: flex; align-items: center; gap: 8px; padding: 0.625rem 0.75rem; border-right: 1px solid var(--border); }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
   .pname { font-size: 13px; font-weight: 500; color: var(--text); }
-  .cell {
-    border-left: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    padding: 6px 2px;
-  }
-  .cell-btn {
-    width: 34px; height: 34px; border-radius: 50%;
-    border: 1.5px solid var(--green);
-    background: var(--green-light);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-    transition: transform 0.1s;
-    color: var(--green);
-  }
+  .cell { border-left: 1px solid var(--border); display: flex; align-items: center; justify-content: center; padding: 6px 2px; }
+  .cell-btn { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--green); background: var(--green-light); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: transform 0.1s; color: var(--green); }
   .cell-btn:active { transform: scale(0.88); }
-  .cell-btn.absent {
-    background: var(--red-light);
-    border-color: var(--red);
-    color: var(--red);
-  }
-  .summary-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem 1.25rem;
-    margin-bottom: 1rem;
-    display: flex; gap: 1rem;
-  }
+  .cell-btn.absent { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; gap: 1rem; }
   .stat { flex: 1; }
   .stat-val { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
   .stat-val span { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
   .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
   .divider { width: 1px; background: var(--border); }
-  .add-guest-btn {
-    width: 100%; padding: 0.875rem;
-    background: var(--surface); border: 1.5px dashed var(--border);
-    border-radius: var(--radius); cursor: pointer;
-    font-size: 14px; color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 1rem;
-  }
+  .add-guest-btn { width: 100%; padding: 0.875rem; background: var(--surface); border: 1.5px dashed var(--border); border-radius: var(--radius); cursor: pointer; font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1rem; }
   .add-guest-btn:active { background: var(--bg); }
-  .guest-form {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1rem;
-    margin-bottom: 1rem; display: none;
-  }
+  .guest-form { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; display: none; }
   .guest-form p { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
-  .guest-form input {
-    width: 100%; padding: 10px 12px;
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    background: var(--bg); color: var(--text);
-    font-size: 15px; outline: none;
-    margin-bottom: 10px;
-  }
+  .guest-form input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-size: 15px; outline: none; margin-bottom: 10px; }
   .guest-form input:focus { border-color: var(--accent); }
   .form-btns { display: flex; gap: 8px; }
-  .form-btns button {
-    flex: 1; padding: 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: none; cursor: pointer;
-    font-size: 14px; color: var(--text);
-  }
-  .form-btns button.ok {
-    background: var(--accent); color: white; border-color: var(--accent);
-    font-weight: 500;
-  }
+  .form-btns button { flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: none; cursor: pointer; font-size: 14px; color: var(--text); }
+  .form-btns button.ok { background: var(--accent); color: white; border-color: var(--accent); font-weight: 500; }
   .form-btns button:active { opacity: 0.8; }
-  .legend {
-    display: flex; gap: 1rem; padding: 0 0.25rem;
-    margin-bottom: 1rem;
-  }
+  .legend { display: flex; gap: 1rem; padding: 0 0.25rem; margin-bottom: 1rem; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
   .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .remove-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; padding: 0; text-align: left; line-height: 1.4; display: block; }
+  .remove-btn:active { color: var(--red); }
 </style>
 </head>
 <body>
 
 <header>
   <div class="header-top">
-    <span class="app-title">🏠 Présences maison</span>
+    <span class="app-title">🏠 Knock Knock <span class="sync-dot" id="sync-dot"></span></span>
     <span class="today-badge" id="today-badge"></span>
   </div>
   <div class="week-nav">
-    <button onclick="changeWeek(-1)" aria-label="Semaine précédente">‹</button>
+    <button onclick="changeWeek(-1)">‹</button>
     <span class="week-label" id="week-label"></span>
-    <button onclick="changeWeek(1)" aria-label="Semaine suivante">›</button>
+    <button onclick="changeWeek(1)">›</button>
   </div>
 </header>
 
 <div class="main">
   <div class="summary-card" id="summary"></div>
-
   <p class="section-label">Cette semaine</p>
   <div class="grid-card" id="grid"></div>
-
   <div class="legend">
-    <div class="legend-item">
-      <div class="legend-dot" style="background:var(--green-light);border:1.5px solid var(--green)"></div>
-      Présent
-    </div>
-    <div class="legend-item">
-      <div class="legend-dot" style="background:var(--red-light);border:1.5px solid var(--red)"></div>
-      Absent
-    </div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green-light);border:1.5px solid var(--green)"></div>Présent</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red-light);border:1.5px solid var(--red)"></div>Absent</div>
   </div>
-
-  <button class="add-guest-btn" id="add-btn" onclick="showForm()">
-    ＋ Ajouter un invité
-  </button>
+  <button class="add-guest-btn" id="add-btn" onclick="showForm()">＋ Ajouter un invité</button>
   <div class="guest-form" id="gform">
     <p>Prénom de l'invité</p>
     <input type="text" id="ginput" placeholder="Ex: Marie" maxlength="16"/>
@@ -230,7 +112,23 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC36NZg0SdOJ2Iyju9fhY7kX1cpLP_K4fc",
+  authDomain: "toc-toc-b0d1d.firebaseapp.com",
+  databaseURL: "https://toc-toc-b0d1d-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "toc-toc-b0d1d",
+  storageBucket: "toc-toc-b0d1d.firebasestorage.app",
+  messagingSenderId: "1014939681721",
+  appId: "1:1014939681721:web:0e530ef143e5407d44ec68"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MONTHS = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
 const FULL_MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
@@ -242,19 +140,36 @@ const AVATARS = [
   {bg:'#fee2e2',color:'#991b1b'},
 ];
 
-let weekOffset = 0;
 const BASE_PEOPLE = [
-  {id:1, name:'Mam', initials:'Ma', av:0},
-  {id:2, name:'Matth', initials:'Mt', av:1},
-  {id:3, name:'Alice', initials:'Al', av:2},
+  {id:'1', name:'Mam', initials:'Ma', av:0},
+  {id:'2', name:'Matth', initials:'Mt', av:1},
+  {id:'3', name:'Alice', initials:'Al', av:2},
 ];
-let guests = JSON.parse(localStorage.getItem('guests') || '[]');
-let people = [...BASE_PEOPLE, ...guests];
-let absences = JSON.parse(localStorage.getItem('absences') || '{}');
 
-function save() {
-  localStorage.setItem('absences', JSON.stringify(absences));
-  localStorage.setItem('guests', JSON.stringify(guests));
+let weekOffset = 0;
+let guests = [];
+let people = [...BASE_PEOPLE];
+let absences = {};
+
+function setSyncStatus(status) {
+  const dot = document.getElementById('sync-dot');
+  dot.className = 'sync-dot ' + status;
+}
+
+// Listen to Firebase in real time
+onValue(ref(db, 'data'), (snapshot) => {
+  const val = snapshot.val() || {};
+  absences = val.absences || {};
+  guests = val.guests || [];
+  people = [...BASE_PEOPLE, ...guests];
+  setSyncStatus('synced');
+  render();
+});
+
+async function saveToFirebase() {
+  setSyncStatus('syncing');
+  await set(ref(db, 'data'), { absences, guests });
+  setSyncStatus('synced');
 }
 
 function getMonday(offset) {
@@ -272,66 +187,61 @@ function dateKey(d) {
 
 function todayKey() { return dateKey(new Date()); }
 
-function toggle(pid, dk) {
+window.toggle = function(pid, dk) {
   const k = String(pid) + '_' + dk;
   absences[k] = !absences[k];
-  save();
+  saveToFirebase();
   render();
 }
 
-function changeWeek(d) { weekOffset += d; render(); }
+window.changeWeek = function(d) { weekOffset += d; render(); }
 
-function showForm() {
+window.showForm = function() {
   document.getElementById('gform').style.display = 'block';
   document.getElementById('add-btn').style.display = 'none';
   document.getElementById('ginput').focus();
 }
 
-function cancelGuest() {
+window.cancelGuest = function() {
   document.getElementById('gform').style.display = 'none';
   document.getElementById('add-btn').style.display = 'flex';
   document.getElementById('ginput').value = '';
 }
 
-function addGuest() {
+window.addGuest = function() {
   const name = document.getElementById('ginput').value.trim();
   if (!name) return;
   const id = 'g' + Date.now();
-  const guest = {id, name, initials: name.slice(0,2).toUpperCase(), av: (BASE_PEOPLE.length + guests.length) % AVATARS.length};
-  guests.push(guest);
+  guests.push({id, name, initials: name.slice(0,2).toUpperCase(), av: (BASE_PEOPLE.length + guests.length) % AVATARS.length});
   people = [...BASE_PEOPLE, ...guests];
-  save();
+  saveToFirebase();
   cancelGuest();
   render();
 }
 
-function removeGuest(id) {
+window.removeGuest = function(id) {
   guests = guests.filter(g => g.id !== id);
   people = [...BASE_PEOPLE, ...guests];
-  save();
+  saveToFirebase();
   render();
 }
 
 function render() {
   const monday = getMonday(weekOffset);
-  const days = Array.from({length:7}, (_,i) => {
-    const d = new Date(monday); d.setDate(d.getDate()+i); return d;
-  });
+  const days = Array.from({length:7}, (_,i) => { const d = new Date(monday); d.setDate(d.getDate()+i); return d; });
   const today = todayKey();
 
-  // Badge today
   const now = new Date();
   document.getElementById('today-badge').textContent = now.getDate() + ' ' + FULL_MONTHS[now.getMonth()];
 
-  // Week label
   const from = days[0].getDate() + ' ' + MONTHS[days[0].getMonth()];
   const to = days[6].getDate() + ' ' + MONTHS[days[6].getMonth()];
   document.getElementById('week-label').textContent = from + ' → ' + to;
 
-  // Summary
-  const todayAbsent = people.filter(p => absences[p.id+'_'+today]).length;
+  const todayAbsent = people.filter(p => absences[String(p.id)+'_'+today]).length;
   const todayPresent = people.length - todayAbsent;
-  const weekAbsences = days.reduce((s,d) => s + people.filter(p => absences[p.id+'_'+dateKey(d)]).length, 0);
+  const weekAbsences = days.reduce((s,d) => s + people.filter(p => absences[String(p.id)+'_'+dateKey(d)]).length, 0);
+
   document.getElementById('summary').innerHTML = `
     <div class="stat">
       <div class="stat-val">${todayPresent}<span>/${people.length}</span></div>
@@ -344,11 +254,9 @@ function render() {
     </div>
   `;
 
-  // Grid header
   let html = '<div class="grid-header"><div class="gh-empty"></div>';
   days.forEach((d,i) => {
-    const dk = dateKey(d);
-    const isToday = dk === today;
+    const isToday = dateKey(d) === today;
     html += `<div class="day-head${isToday?' today':''}">
       <span class="dname">${DAYS[i]}</span>
       <span class="dnum">${d.getDate()}</span>
@@ -356,7 +264,6 @@ function render() {
   });
   html += '</div>';
 
-  // Person rows
   people.forEach(p => {
     const av = AVATARS[p.av % AVATARS.length];
     const isGuest = String(p.id).startsWith('g');
@@ -365,14 +272,14 @@ function render() {
         <div class="avatar" style="background:${av.bg};color:${av.color}">${p.initials}</div>
         <div style="display:flex;flex-direction:column;min-width:0">
           <span class="pname">${p.name}</span>
-          ${isGuest ? `<button onclick="removeGuest('${p.id}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px;padding:0;text-align:left;line-height:1.2">Supprimer</button>` : ''}
+          ${isGuest ? `<button class="remove-btn" onclick="removeGuest('${p.id}')">Supprimer</button>` : ''}
         </div>
       </div>`;
     days.forEach(d => {
       const dk = dateKey(d);
       const absent = !!absences[String(p.id)+'_'+dk];
       html += `<div class="cell">
-        <button class="cell-btn${absent?' absent':''}" onclick="toggle('${p.id}','${dk}')" aria-label="${p.name} ${dk}">
+        <button class="cell-btn${absent?' absent':''}" onclick="toggle('${p.id}','${dk}')">
           ${absent ? '✕' : '✓'}
         </button>
       </div>`;
