@@ -363,7 +363,10 @@ function render() {
     html += `<div class="person-row">
       <div class="person-label">
         <div class="avatar" style="background:${av.bg};color:${av.color}">${p.initials}</div>
-        <span class="pname">${p.name}${isGuest ? ` <button onclick="removeGuest('${p.id}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0 2px" title="Supprimer">✕</button>` : ''}</span>
+        <div style="display:flex;flex-direction:column;min-width:0">
+          <span class="pname">${p.name}</span>
+          ${isGuest ? `<button onclick="removeGuest('${p.id}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px;padding:0;text-align:left;line-height:1.2">Supprimer</button>` : ''}
+        </div>
       </div>`;
     days.forEach(d => {
       const dk = dateKey(d);
