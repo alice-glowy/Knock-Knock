@@ -243,15 +243,18 @@ const AVATARS = [
 ];
 
 let weekOffset = 0;
-let people = [
+const BASE_PEOPLE = [
   {id:1, name:'Mam', initials:'Ma', av:0},
   {id:2, name:'Matth', initials:'Mt', av:1},
   {id:3, name:'Alice', initials:'Al', av:2},
 ];
+let guests = JSON.parse(localStorage.getItem('guests') || '[]');
+let people = [...BASE_PEOPLE, ...guests];
 let absences = JSON.parse(localStorage.getItem('absences') || '{}');
 
 function save() {
   localStorage.setItem('absences', JSON.stringify(absences));
+  localStorage.setItem('guests', JSON.stringify(guests));
 }
 
 function getMonday(offset) {
@@ -294,8 +297,18 @@ function addGuest() {
   const name = document.getElementById('ginput').value.trim();
   if (!name) return;
   const id = 'g' + Date.now();
-  people.push({id, name, initials: name.slice(0,2).toUpperCase(), av: people.length % AVATARS.length});
+  const guest = {id, name, initials: name.slice(0,2).toUpperCase(), av: (BASE_PEOPLE.length + guests.length) % AVATARS.length};
+  guests.push(guest);
+  people = [...BASE_PEOPLE, ...guests];
+  save();
   cancelGuest();
+  render();
+}
+
+function removeGuest(id) {
+  guests = guests.filter(g => g.id !== id);
+  people = [...BASE_PEOPLE, ...guests];
+  save();
   render();
 }
 
@@ -346,10 +359,11 @@ function render() {
   // Person rows
   people.forEach(p => {
     const av = AVATARS[p.av % AVATARS.length];
+    const isGuest = String(p.id).startsWith('g');
     html += `<div class="person-row">
       <div class="person-label">
         <div class="avatar" style="background:${av.bg};color:${av.color}">${p.initials}</div>
-        <span class="pname">${p.name}</span>
+        <span class="pname">${p.name}${isGuest ? ` <button onclick="removeGuest('${p.id}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0 2px" title="Supprimer">✕</button>` : ''}</span>
       </div>`;
     days.forEach(d => {
       const dk = dateKey(d);
